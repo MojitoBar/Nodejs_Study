@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/MojitoBar/Nodejs_Study#readme",
   "dependencies": {
-    "express": "^4.16.4"
+    "express": "^4.16.4",
+    "jade": "^1.11.0"
   }
 }
