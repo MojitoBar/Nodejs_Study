@@ -7,47 +7,49 @@ var app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.set('views', './views');
 app.set('view engine', 'jade');
-app.get('/topic/new', function(req, res){
-    res.render('new');
-})
-app.get('/topic', function(req, res){
-    fs.readdir('data', function(err, files){
-        if(err){
+app.get('/topic/new', function (req, res) {
+    fs.readdir('data', function (err, files) {
+        if(err) {
             console.log(err);
             res.status(500).send('Internal Server Error');
-        }
-        res.render('view', {topics: files});
-    })
-})
-
-app.get('/topic/:id', function(req, res){
-    var id = req.params.id;
-    
-    fs.readdir('data', function(err, files){
-        if(err){
-            console.log(err);
-            res.status(500).send('Internal Server Error');
-        }
-        fs.readFile('data/'+id, 'utf8', function(err, data){
-            if(err){
-                console.log(err);
-                res.status(500).send('Internal Server Error');
-            }
-            res.render('view', {topics: files, title: id, description: data});
-        })
-    })
-})
-
-app.post('/topic', function(req, res){
-    var title = req.body.title;
-    var description = req.body.description;
-    fs.writeFile('data/'+title, description, function(err){
-        if(err){
-            res.status(500).send('Internal Server Error');
-        }
-        res.send('Success!'); 
+        }    
+        res.render('new', {topics: files});
     });
 })
-app.listen(3000, function(req, res){
+app.get(['/topic', '/topic/:id'], function (req, res) {
+    fs.readdir('data', function (err, files) {
+        if(err) {
+            console.log(err);
+            res.status(500).send('Internal Server Error');
+        }
+        var id = req.params.id;
+        if(id) {
+            // id 값이 있다면
+            fs.readFile('data/' + id, 'utf8', function (err, data) {
+                if (err) {
+                    console.log(err);
+                    res.status(500).send('Internal Server Error');
+                }
+                res.render('view', { topics: files, title: id, description: data });
+            })
+        }
+        else{
+            // id 값이 없다면
+            res.render('view', { topics: files, title: 'Welcome', description: 'Hello, Javascript for server.'});
+        }
+    })
+})
+
+app.post('/topic', function (req, res) {
+    var title = req.body.title;
+    var description = req.body.description;
+    fs.writeFile('data/' + title, description, function (err) {
+        if (err) {
+            res.status(500).send('Internal Server Error');
+        }
+        res.redirect('/topic/'+title);
+    });
+})
+app.listen(3000, function (req, res) {
     console.log('Connected, 3000 port!');
 })
